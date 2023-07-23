@@ -1,5 +1,11 @@
 classdef PlaneDoubleIntObj < handle
     properties (Access = public)
+        actual_x
+        actual_y
+        
+        delta_x
+        delta_y
+        
         x
         y
         
@@ -19,8 +25,9 @@ classdef PlaneDoubleIntObj < handle
     properties (Access = private)
         dot_x
         dot_y
+        
         P=0.0005;
-        D=0.03;
+        D=3;
         K=0.001;
     end
     
@@ -30,6 +37,10 @@ classdef PlaneDoubleIntObj < handle
             obj.dot_x = 0;
             obj.y = 0;
             obj.dot_y = 0;
+            
+            obj.actual_x = 0;
+            obj.actual_y = 0;
+            
             obj.vartheta_x=0;
             obj.vartheta_y=0;
             obj.vartheta_dot_x=0;
@@ -53,28 +64,29 @@ classdef PlaneDoubleIntObj < handle
         end
         
         function obj = update(obj, u, dt, robots)
-
+            
             summs=get_summs(obj,robots);
             u_x=u(1);
             u_y=u(2);
+            
             obj.x = obj.x + obj.dot_x * dt;
             obj.dot_x = obj.dot_x + u_x * dt;
             obj.y = obj.y + obj.dot_y * dt;
             obj.dot_y = obj.dot_y + u_y * dt;
-
+            
+            obj.actual_x = obj.x + obj.delta_x;
+            obj.actual_y = obj.y + obj.delta_y;
             
             obj.vartheta_x=obj.vartheta_x+obj.vartheta_dot_x*dt;
             obj.vartheta_y=obj.vartheta_y+obj.vartheta_dot_y*dt;
             obj.vartheta_dot_x=obj.vartheta_dot_x+obj.vartheta_ddot_x*dt;
             obj.vartheta_dot_y=obj.vartheta_dot_y+obj.vartheta_ddot_y*dt;
-
-
-
+            
             obj.vartheta_ddot_x=-obj.P*summs(1)-obj.D*obj.vartheta_dot_x-u_x;
             obj.vartheta_ddot_y=-obj.P*summs(2)-obj.D*obj.vartheta_dot_y-u_y;
-
+            
         end
-
+        
         
         function obj=set_connections(obj,connections)
             for i=connections
@@ -98,6 +110,12 @@ classdef PlaneDoubleIntObj < handle
             obj.dot_x = state(2);
             obj.y = state(3);
             obj.dot_y = state(4);
+            set_vartheta(obj, [state(1),state(3)]);
+        end
+        
+        function obj = set_delta(obj, delta)
+            obj.delta_x = delta(1);
+            obj.delta_y = delta(2);
         end
         
         function obj = set_xy(obj, p)
@@ -115,6 +133,14 @@ classdef PlaneDoubleIntObj < handle
             state(2) = obj.dot_x;
             state(3) = obj.y;
             state(4) = obj.dot_y;
+        end
+        
+        function state = get_actual_state(obj)
+            state(1) = obj.actual_x;
+            state(2) = obj.dot_x;
+            state(3) = obj.actual_y;
+            state(4) = obj.dot_y;
+            
         end
         
         function controls = get_controls(obj)
@@ -137,6 +163,9 @@ classdef PlaneDoubleIntObj < handle
             end
             summs=[summs_x;summs_y];
         end
-
+        function set_vartheta(obj, vartheta)
+            obj.vartheta_x=vartheta(1);
+            obj.vartheta_y=vartheta(1);
         end
+    end
 end
