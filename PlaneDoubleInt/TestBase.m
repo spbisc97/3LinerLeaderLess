@@ -46,8 +46,8 @@ while t<1000
     t=t+dt;
     y=[];
     for index = 1:n_robots
-        u=robots(index).get_control(robots);
-        robots(index).update(u,dt);
+        u=robots(index).get_controls();
+        robots(index).update(u,dt,robots);
         y=[y,robots(index).get_state()];
     end
     Y=[Y;y];
