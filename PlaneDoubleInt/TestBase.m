@@ -12,7 +12,7 @@ colors=colormap();
 colors=colors(1:floor(end/n_robots):floor(end/n_robots)*n_robots,:);
 colors=colors(1:n_robots,:);%add this to each figure
 lw=0.2;%linewidth
-ls='--';%linestyle
+ls='-';%linestyle
 mk='o';%marker
 mi=500;%marker interval
 
@@ -111,7 +111,7 @@ plot(Y(:,1:4:end),Y(:,3:4:end), ...
     'LineWidth',lw, ...
     'LineStyle',ls,...
     'Marker',mk,...
-    'MarkerIndices',1:mi:length(tspan))
+    'MarkerIndices',1)
 axis square
 axis equal
 hold on
