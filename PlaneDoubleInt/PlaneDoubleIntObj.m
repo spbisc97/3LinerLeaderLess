@@ -147,7 +147,6 @@ classdef PlaneDoubleIntObj < handle
         
         function controls = get_controls(obj)
             controls = -obj.K*[obj.x-obj.vartheta_x,obj.y-obj.vartheta_y];
-            disp(controls)
         end
     end
     methods (Access = private)
