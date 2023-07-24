@@ -26,8 +26,8 @@ classdef PlaneDoubleIntObj < handle
         dot_x
         dot_y
         
-        P=0.01;
-        D=1;
+        P=0.007;
+        D=0.6;
         K=0.1;
     end
     
@@ -82,8 +82,8 @@ classdef PlaneDoubleIntObj < handle
             obj.vartheta_dot_x=obj.vartheta_dot_x+obj.vartheta_ddot_x*dt;
             obj.vartheta_dot_y=obj.vartheta_dot_y+obj.vartheta_ddot_y*dt;
             
-            obj.vartheta_ddot_x=-obj.P*summs(1)-obj.D*obj.vartheta_dot_x-u_x;
-            obj.vartheta_ddot_y=-obj.P*summs(2)-obj.D*obj.vartheta_dot_y-u_y;
+            obj.vartheta_ddot_x=-obj.P*summs(1)-obj.D*obj.vartheta_dot_x-u_x*dt;
+            obj.vartheta_ddot_y=-obj.P*summs(2)-obj.D*obj.vartheta_dot_y-u_y*dt;
             
         end
         

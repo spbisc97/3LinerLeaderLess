@@ -1,6 +1,6 @@
 close all
 
-dt=0.5;
+dt=0.25;
 tspan=0;
 Y=[];
 y=[];
@@ -15,7 +15,7 @@ colors=colors(1:n_robots,:);%add this to each figure
 lw=0.2;%linewidth
 ls='--';%linestyle
 mk='o';%marker
-mi=400;%marker interval
+mi=500;%marker interval
 
 %% create adjacency matrix
 adj_mat=zeros(n_robots,n_robots);
@@ -69,7 +69,7 @@ end
 
 %% run simulation
 t=0;
-while t<10000
+while t<5e3
     t=t+dt;
     y=[];
     for index = 1:n_robots
@@ -83,7 +83,7 @@ while t<10000
         %break condition
         break
     end
-
+    
 end
 %% plots
 %time-position plane
@@ -114,18 +114,28 @@ plot(Y(:,1:4:end),Y(:,3:4:end), ...
     'Marker',mk,...
     'MarkerIndices',1:mi:length(tspan))
 axis square
+axis equal
 hold on
-y=[];
+z_c=[];
 for index = 1:n_robots
-    y=[y,robots(index).get_state()];
+    z_c=[z_c,robots(index).get_state()];
 end
-C=[sum(y(:,1:4:end))/n_robots,sum(y(:,3:4:end))/n_robots];
+C=[sum(z_c(:,1:4:end))/n_robots,sum(z_c(:,3:4:end))/n_robots];
+disp(y)
 last_t=tspan(end);
 if type==1
-    plot(sin(tspan/last_t)+C(1),cos(tspan/10)+C(2), ...
+    plot(cos(tspan/last_t)+C(1),sin(tspan/last_t)+C(2), ...
         'LineWidth',0.1 )
-    elseif type==2
-    plot(sin(angle*tspan/last_t)*distance.*tspan/last_t+C(1),cos(angle*tspan/last_t)*distance.*tspan/last_t+C(2),'LineWidth',0.1)
+    axis square
+    axis equal
+    
+elseif type==2
+    plot(distance.*(tspan/last_t).*cos(angle*tspan/last_t)+C(1),...
+        distance.*(tspan/last_t).*sin(angle*tspan/last_t)+C(2),...
+        'LineWidth',0.1)
+    axis square
+    axis equal
+    
 end
 
 legend
