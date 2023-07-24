@@ -26,9 +26,9 @@ classdef PlaneDoubleIntObj < handle
         dot_x
         dot_y
         
-        P=0.0005;
-        D=3;
-        K=0.001;
+        P=0.01
+        D=0.6;
+        K=0.1;
     end
     
     methods (Access = public)
@@ -106,11 +106,13 @@ classdef PlaneDoubleIntObj < handle
         
         
         function obj = set_state(obj, state)
-            obj.x = state(1);
+            obj.actual_x = state(1);
+            obj.x = state(1)-obj.delta_x;
             obj.dot_x = state(2);
-            obj.y = state(3);
+            obj.actual_y = state(3);
+            obj.y = state(3)-obj.delta_y;
             obj.dot_y = state(4);
-            set_vartheta(obj, [state(1),state(3)]);
+            set_vartheta(obj,[obj.x;obj.y]);
         end
         
         function obj = set_delta(obj, delta)
@@ -145,6 +147,7 @@ classdef PlaneDoubleIntObj < handle
         
         function controls = get_controls(obj)
             controls = -obj.K*[obj.x-obj.vartheta_x,obj.y-obj.vartheta_y];
+            disp(controls)
         end
     end
     methods (Access = private)
@@ -165,7 +168,7 @@ classdef PlaneDoubleIntObj < handle
         end
         function set_vartheta(obj, vartheta)
             obj.vartheta_x=vartheta(1);
-            obj.vartheta_y=vartheta(1);
+            obj.vartheta_y=vartheta(2);
         end
     end
 end

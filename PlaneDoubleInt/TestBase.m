@@ -12,10 +12,10 @@ prev=n_robots;
 colors=colormap();
 colors=colors(1:floor(end/n_robots):floor(end/n_robots)*n_robots,:);
 colors=colors(1:n_robots,:);%add this to each figure
-lw=0.6;%linewidth
+lw=0.2;%linewidth
 ls='--';%linestyle
 mk='o';%marker
-mi=200;%marker interval
+mi=400;%marker interval
 
 %% create adjacency matrix
 adj_mat=zeros(n_robots,n_robots);
@@ -45,7 +45,12 @@ end
 %% set initial robot position
 for index = 1:n_robots
     robots(index).set_state(randn(1,4).*[1,0,1,0]);
-    y=[y,robots(index).get_state()];
+    robots(index).update([0;0],dt,robots);
+    
+end
+y=[];
+for index = 1:n_robots
+    y=[y,robots(index).get_actual_state()];
 end
 Y=[Y;y];
 %% show adj matrix from robots
@@ -65,7 +70,7 @@ while t<10000
     end
     Y=[Y;y];
     tspan=[tspan,t-dt];
-    if sum(abs(Y(end,:)-Y(end-1,:)))<1e-5
+    if t>100 & sum(abs(Y(end,:)-Y(end-1,:)))<1e-5
         %break condition
         break
     end
@@ -101,8 +106,13 @@ plot(Y(:,1:4:end),Y(:,3:4:end), ...
     'MarkerIndices',1:mi:length(tspan))
 axis square
 hold on
+y=[];
+for index = 1:n_robots
+    y=[y,robots(index).get_state()];
+end
+C=[sum(y(:,1:4:end))/n_robots,sum(y(:,3:4:end))/n_robots];
 
-plot(sin(tspan/10),cos(tspan/10), ...
+plot(sin(tspan/10)+C(1),cos(tspan/10)+C(2), ...
     'LineWidth',0.1 )
 
 legend
