@@ -5,7 +5,7 @@ tspan=0;
 Y=[];
 y=[];
 robots=[];
-n_robots=4;
+n_robots=10;
 prev=n_robots;
 
 %% plot Settings
@@ -26,11 +26,20 @@ for index = 1:n_robots
 end
 
 %% create delta matrix
-distance=1;
+distance=3;
 delta_mat=zeros(n_robots,2);
-for i=1:n_robots
-    delta_mat(i,1)=distance*cos(2*pi*i/n_robots);
-    delta_mat(i,2)=distance*sin(2*pi*i/n_robots);
+type=2;
+if type==1
+    for i=1:n_robots
+        delta_mat(i,1)=distance*cos(2*pi*i/n_robots);
+        delta_mat(i,2)=distance*sin(2*pi*i/n_robots);
+    end
+elseif type==2
+    angle=8*pi;
+    for i=1:n_robots
+        delta_mat(i,1)=distance*(i/n_robots)*cos(angle*i/n_robots);
+        delta_mat(i,2)=distance*(i/n_robots)*sin(angle*i/n_robots);
+    end
 end
 
 
@@ -70,7 +79,7 @@ while t<10000
     end
     Y=[Y;y];
     tspan=[tspan,t-dt];
-    if t>100 & sum(abs(Y(end,:)-Y(end-1,:)))<1e-5
+    if t>100 & sum(abs(Y(end,:)-Y(end-1,:)))<1e-6
         %break condition
         break
     end
@@ -111,9 +120,13 @@ for index = 1:n_robots
     y=[y,robots(index).get_state()];
 end
 C=[sum(y(:,1:4:end))/n_robots,sum(y(:,3:4:end))/n_robots];
-
-plot(sin(tspan/10)+C(1),cos(tspan/10)+C(2), ...
-    'LineWidth',0.1 )
+last_t=tspan(end);
+if type==1
+    plot(sin(tspan/last_t)+C(1),cos(tspan/10)+C(2), ...
+        'LineWidth',0.1 )
+    elseif type==2
+    plot(sin(angle*tspan/last_t)*distance.*tspan/last_t+C(1),cos(angle*tspan/last_t)*distance.*tspan/last_t+C(2),'LineWidth',0.1)
+end
 
 legend
 

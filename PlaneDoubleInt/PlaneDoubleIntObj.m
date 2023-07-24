@@ -26,8 +26,8 @@ classdef PlaneDoubleIntObj < handle
         dot_x
         dot_y
         
-        P=0.01
-        D=0.6;
+        P=0.01;
+        D=1;
         K=0.1;
     end
     
