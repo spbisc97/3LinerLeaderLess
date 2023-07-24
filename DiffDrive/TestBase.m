@@ -4,7 +4,7 @@ dt=0.25;
 tspan=0;
 Y=[];
 robots=[];
-n_robots=10;
+n_robots=6;
 prev=n_robots;
 
 %% plot Settings
@@ -12,7 +12,7 @@ colors=colormap();
 colors=colors(1:floor(end/n_robots):floor(end/n_robots)*n_robots,:);
 colors=colors(1:n_robots,:);%add this to each figure
 lw=0.2;%linewidth
-ls='--';%linestyle
+ls='-';%linestyle
 mk='o';%marker
 mi=500;%marker interval
 
@@ -25,7 +25,7 @@ for index = 1:n_robots
 end
 
 %% create delta matrix
-distance=3;
+distance=2;
 delta_mat=zeros(n_robots,2);
 type=2;
 if type==1
@@ -52,7 +52,7 @@ for index = 1:n_robots
 end
 %% set initial robot position
 for index = 1:n_robots
-    robots(index).set_state(randn(1,6).*[1,0,1,0,1,0]);
+    robots(index).set_state(randn(1,6).*[1,0,1,0,3,0]);
     robots(index).update([0;0;0],dt,robots);
     
 end
@@ -72,7 +72,7 @@ while t<5e3
     t=t+dt;
     y=[];
     for index = 1:n_robots
-        u=robots(index).get_controls();
+        u=robots(index).get_controls(t);
         robots(index).update(u,dt,robots);
         y=[y,robots(index).get_actual_state()];
     end
@@ -89,29 +89,36 @@ end
 figure(1)
 colororder(colors())
 nexttile
-plot(tspan,Y(:,1:4:end),...
+plot(tspan,Y(:,1:6:end),...
     'LineWidth',lw, ...
     'LineStyle',ls,...
     'Marker',mk,...
     'MarkerIndices',1:mi:length(tspan))
 legend()
 nexttile
-plot(tspan,Y(:,3:4:end), ...
+plot(tspan,Y(:,3:6:end), ...
     'LineWidth',lw, ...
     'LineStyle',ls,...
     'Marker',mk,...
     'MarkerIndices',1:mi:length(tspan))
-legend
+legend()
+nexttile
+plot(tspan,Y(:,5:6:end), ...
+    'LineWidth',lw, ...
+    'LineStyle',ls,...
+    'Marker',mk,...
+    'MarkerIndices',1:mi:length(tspan))
+legend()
 
 %x-y plane
 figure(2)
 colororder(colors())
 
-plot(Y(:,1:4:end),Y(:,3:4:end), ...
+plot(Y(:,1:6:end),Y(:,3:6:end), ...
     'LineWidth',lw, ...
     'LineStyle',ls,...
     'Marker',mk,...
-    'MarkerIndices',1:mi:length(tspan))
+    'MarkerIndices',1)
 axis square
 axis equal
 hold on
@@ -119,8 +126,9 @@ z_c=[];
 for index = 1:n_robots
     z_c=[z_c,robots(index).get_state()];
 end
-C=[sum(z_c(:,1:4:end))/n_robots,sum(z_c(:,3:4:end))/n_robots];
-disp([(((1:n_robots).')),(z_c(:,1:4:end).'),(z_c(:,3:4:end).')])
+C=[sum(z_c(:,1:6:end))/n_robots,sum(z_c(:,3:6:end))/n_robots];
+
+disp([(((1:n_robots).')),(z_c(:,1:6:end).'),(z_c(:,3:6:end).'),(z_c(:,5:6:end).')])
 last_t=tspan(end);
 if type==1
     plot(cos(tspan/last_t)+C(1),sin(tspan/last_t)+C(2), ...

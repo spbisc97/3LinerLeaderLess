@@ -34,6 +34,13 @@ classdef DiffDriveObj < handle
         P=0.001;
         D=1;
         K=0.1;
+        
+        P_theta=0.0005;
+        D_theta=0.1;
+        K_theta=0.01;
+        
+        K_alpha=0.01;
+        alpha=@(t) sin(t)*0.1;
     end
     
     methods (Access = public)
@@ -57,6 +64,9 @@ classdef DiffDriveObj < handle
             obj.vartheta_ddot_y=0;
             obj.vartheta_ddot_theta=0;
             obj.index = index;
+            
+            f=@(t) 3+sin(t)+cos(3*t)-sin(4*t)-cos(5*t)+sin(0.5*t);
+            obj.alpha=@(t,theta,x,y,vartheta_x,vartheta_y) obj.K_alpha*f(t)*[-sin(theta),cos(theta)]*[vartheta_x-x;vartheta_y-y];
         end
         
         function obj = reset(obj)
@@ -105,7 +115,7 @@ classdef DiffDriveObj < handle
             
             obj.vartheta_theta=obj.vartheta_theta+obj.vartheta_dot_theta*dt;
             obj.vartheta_dot_theta=obj.vartheta_dot_theta+obj.vartheta_ddot_theta*dt;
-            obj.vartheta_ddot_theta=-obj.P*summs(3)-obj.D*obj.vartheta_dot_theta-u_theta;
+            obj.vartheta_ddot_theta=-obj.P_theta*summs(3)-obj.D_theta*obj.vartheta_dot_theta-u_theta*dt;
             
         end
         
@@ -144,21 +154,14 @@ classdef DiffDriveObj < handle
             obj.delta_y = delta(2);
         end
         
-        function obj = set_xy(obj, p)
-            obj.x = p(1);
-            obj.y = p(2);
-        end
-        
-        function obj = set_dot_x(obj, v)
-            obj.dot_x = v(1);
-            obj.dot_y = v(2);
-        end
         
         function state = get_state(obj)
             state(1) = obj.x;
             state(2) = obj.dot_x;
             state(3) = obj.y;
             state(4) = obj.dot_y;
+            state(5) = obj.theta;
+            state(6) = obj.dot_theta;
         end
         
         function state = get_actual_state(obj)
@@ -166,15 +169,18 @@ classdef DiffDriveObj < handle
             state(2) = obj.dot_x;
             state(3) = obj.actual_y;
             state(4) = obj.dot_y;
+            state(5) = obj.theta;
+            state(6) = obj.dot_theta;
             
         end
         
-        function controls = get_controls(obj)
-            controls = -obj.K*[...
-                obj.x-obj.vartheta_x,...
-                obj.y-obj.vartheta_y,...
-                obj.theta-obj.vartheta_theta+randn()*(obj.x-obj.vartheta_x*0.1+obj.y-obj.vartheta_y*0.1)...
+        function controls = get_controls(obj,t)
+            controls = -[...
+                obj.K*(obj.x-obj.vartheta_x),...
+                obj.K*(obj.y-obj.vartheta_y),...
+                obj.K_theta*(obj.theta-obj.vartheta_theta)+obj.alpha(t,obj.theta,obj.x,obj.y,obj.vartheta_x,obj.vartheta_y)...
                 ];
+            
         end
     end
     methods (Access = private)
