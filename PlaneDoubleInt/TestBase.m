@@ -3,7 +3,6 @@ close all
 dt=0.25;
 tspan=0;
 Y=[];
-y=[];
 robots=[];
 n_robots=10;
 prev=n_robots;
@@ -79,7 +78,7 @@ while t<5e3
     end
     Y=[Y;y];
     tspan=[tspan,t-dt];
-    if t>100 & sum(abs(Y(end,:)-Y(end-1,:)))<1e-6
+    if t>100 && sum(abs(Y(end,:)-Y(end-1,:)))<1e-6
         %break condition
         break
     end
@@ -121,7 +120,7 @@ for index = 1:n_robots
     z_c=[z_c,robots(index).get_state()];
 end
 C=[sum(z_c(:,1:4:end))/n_robots,sum(z_c(:,3:4:end))/n_robots];
-disp(y)
+disp([(((1:n_robots).')),(z_c(:,1:4:end).'),(z_c(:,3:4:end).')])
 last_t=tspan(end);
 if type==1
     plot(cos(tspan/last_t)+C(1),sin(tspan/last_t)+C(2), ...
