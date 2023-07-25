@@ -88,6 +88,7 @@ end
 %time-position plane
 figure(1)
 colororder(colors())
+tiledlayout(3,1)
 nexttile
 plot(tspan,Y(:,1:6:end),...
     'LineWidth',lw, ...
